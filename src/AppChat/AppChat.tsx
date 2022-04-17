@@ -1,8 +1,20 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { GiftedChat, IMessage } from 'react-native-gifted-chat';
+import { StyleSheet } from 'react-native';
+import {
+  GiftedChat,
+  IMessage,
+  InputToolbar,
+  InputToolbarProps,
+} from 'react-native-gifted-chat';
+
+import ReplyMessageBar from './components/ReplyMessageBar';
 
 const AppChat = () => {
+  const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
+
   const [messages, setMessages] = useState<IMessage[]>([]);
+
+  const clearReplyMessage = () => setReplyMessage(null);
 
   useEffect(() => {
     setMessages([
@@ -25,6 +37,19 @@ const AppChat = () => {
     );
   }, []);
 
+  const renderCustomInputToolbar = (props: InputToolbarProps) => (
+    <InputToolbar
+      {...props}
+      containerStyle={styles.inputContainer}
+      accessoryStyle={styles.replyBarContainer}
+    />
+  );
+
+  const renderAccessory = () =>
+    replyMessage && (
+      <ReplyMessageBar message={replyMessage} clearReply={clearReplyMessage} />
+    );
+
   return (
     <GiftedChat
       messages={messages}
@@ -34,8 +59,25 @@ const AppChat = () => {
       }}
       wrapInSafeArea={false}
       isKeyboardInternallyHandled={false}
+      renderInputToolbar={renderCustomInputToolbar}
+      renderAccessory={renderAccessory}
+      onLongPress={(_, message) => setReplyMessage(message)}
+      messagesContainerStyle={styles.messagesContainer}
     />
   );
 };
+
+const styles = StyleSheet.create({
+  inputContainer: {
+    position: 'relative',
+    flexDirection: 'column-reverse',
+  },
+  replyBarContainer: {
+    height: 'auto',
+  },
+  messagesContainer: {
+    flex: 1,
+  },
+});
 
 export default AppChat;
