@@ -32,6 +32,8 @@ const AppChat = () => {
       user={{
         _id: 1,
       }}
+      wrapInSafeArea={false}
+      isKeyboardInternallyHandled={false}
     />
   );
 };
