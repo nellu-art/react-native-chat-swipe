@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import {
+  BubbleProps,
   GiftedChat,
   IMessage,
   InputToolbar,
@@ -12,11 +13,17 @@ import {
 import ChatMessageBox from './components/ChatMessageBox';
 import ReplyMessageBar from './components/ReplyMessageBar';
 
+type MyMessage = IMessage & {
+  replyMessage?: {
+    text: string;
+  };
+};
+
 const AppChat = () => {
-  const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
+  const [replyMessage, setReplyMessage] = useState<MyMessage | null>(null);
   const swipeableRowRef = useRef<Swipeable | null>(null);
 
-  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [messages, setMessages] = useState<MyMessage[]>([]);
 
   const clearReplyMessage = () => setReplyMessage(null);
 
@@ -35,11 +42,20 @@ const AppChat = () => {
     ]);
   }, []);
 
-  const onSend = useCallback((messages = []) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, messages)
-    );
-  }, []);
+  const onSend = useCallback(
+    (messages = []) => {
+      if (replyMessage) {
+        messages[0].replyMessage = {
+          text: replyMessage.text,
+        };
+      }
+      setMessages((previousMessages) =>
+        GiftedChat.append(previousMessages, messages)
+      );
+      setReplyMessage(null);
+    },
+    [replyMessage]
+  );
 
   const renderCustomInputToolbar = (props: InputToolbarProps) => (
     <InputToolbar
@@ -67,7 +83,7 @@ const AppChat = () => {
     [replyMessage]
   );
 
-  const renderMessageBox = (props: MessageProps<IMessage>) => (
+  const renderMessageBox = (props: MessageProps<MyMessage>) => (
     <ChatMessageBox
       {...props}
       setReplyOnSwipeOpen={setReplyMessage}
@@ -81,6 +97,15 @@ const AppChat = () => {
       swipeableRowRef.current = null;
     }
   }, [replyMessage]);
+
+  const renderReplyMessageView = (props: BubbleProps<MyMessage>) =>
+    props.currentMessage &&
+    props.currentMessage.replyMessage && (
+      <View style={styles.replyMessageContainer}>
+        <Text>{props.currentMessage.replyMessage.text}</Text>
+        <View style={styles.replyMessageDivider} />
+      </View>
+    );
 
   return (
     <GiftedChat
@@ -96,6 +121,7 @@ const AppChat = () => {
       onLongPress={(_, message) => setReplyMessage(message)}
       messagesContainerStyle={styles.messagesContainer}
       renderMessage={renderMessageBox}
+      renderCustomView={renderReplyMessageView}
     />
   );
 };
@@ -110,6 +136,15 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     flex: 1,
+  },
+  replyMessageContainer: {
+    padding: 8,
+    paddingBottom: 0,
+  },
+  replyMessageDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgrey',
+    paddingTop: 6,
   },
 });
 
