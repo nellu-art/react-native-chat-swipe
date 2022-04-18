@@ -118,7 +118,6 @@ const AppChat = () => {
       isKeyboardInternallyHandled={false}
       renderInputToolbar={renderCustomInputToolbar}
       renderAccessory={renderAccessory}
-      onLongPress={(_, message) => setReplyMessage(message)}
       messagesContainerStyle={styles.messagesContainer}
       renderMessage={renderMessageBox}
       renderCustomView={renderReplyMessageView}
