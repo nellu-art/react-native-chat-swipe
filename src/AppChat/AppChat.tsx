@@ -5,8 +5,10 @@ import {
   IMessage,
   InputToolbar,
   InputToolbarProps,
+  MessageProps,
 } from 'react-native-gifted-chat';
 
+import ChatMessageBox from './components/ChatMessageBox';
 import ReplyMessageBar from './components/ReplyMessageBar';
 
 const AppChat = () => {
@@ -50,6 +52,10 @@ const AppChat = () => {
       <ReplyMessageBar message={replyMessage} clearReply={clearReplyMessage} />
     );
 
+  const renderMessageBox = (props: MessageProps<IMessage>) => (
+    <ChatMessageBox {...props} />
+  );
+
   return (
     <GiftedChat
       messages={messages}
@@ -63,6 +69,7 @@ const AppChat = () => {
       renderAccessory={renderAccessory}
       onLongPress={(_, message) => setReplyMessage(message)}
       messagesContainerStyle={styles.messagesContainer}
+      renderMessage={renderMessageBox}
     />
   );
 };
