@@ -7,7 +7,16 @@ import {
 import { IMessage, Message, MessageProps } from 'react-native-gifted-chat';
 import { isSameDay, isSameUser } from 'react-native-gifted-chat/lib/utils';
 
-const ChatMessageBox = (props: MessageProps<IMessage>) => {
+type ChatMessageBoxProps = {
+  setReplyOnSwipeOpen: (message: IMessage) => void;
+  updateRowRef: (ref: any) => void;
+} & MessageProps<IMessage>;
+
+const ChatMessageBox = ({
+  setReplyOnSwipeOpen,
+  updateRowRef,
+  ...props
+}: ChatMessageBoxProps) => {
   const isNextMyMessage =
     props.currentMessage &&
     props.nextMessage &&
@@ -47,12 +56,20 @@ const ChatMessageBox = (props: MessageProps<IMessage>) => {
     );
   };
 
+  const onSwipeOpenAction = () => {
+    if (props.currentMessage) {
+      setReplyOnSwipeOpen({ ...props.currentMessage });
+    }
+  };
+
   return (
     <GestureHandlerRootView>
       <Swipeable
+        ref={updateRowRef}
         friction={2}
         rightThreshold={40}
         renderRightActions={renderRightAction}
+        onSwipeableOpen={onSwipeOpenAction}
       >
         <Message {...props} />
       </Swipeable>

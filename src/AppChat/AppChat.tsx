@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
 import {
   GiftedChat,
   IMessage,
@@ -13,6 +14,7 @@ import ReplyMessageBar from './components/ReplyMessageBar';
 
 const AppChat = () => {
   const [replyMessage, setReplyMessage] = useState<IMessage | null>(null);
+  const swipeableRowRef = useRef<Swipeable | null>(null);
 
   const [messages, setMessages] = useState<IMessage[]>([]);
 
@@ -52,9 +54,33 @@ const AppChat = () => {
       <ReplyMessageBar message={replyMessage} clearReply={clearReplyMessage} />
     );
 
-  const renderMessageBox = (props: MessageProps<IMessage>) => (
-    <ChatMessageBox {...props} />
+  const updateRowRef = useCallback(
+    (ref: any) => {
+      if (
+        ref &&
+        replyMessage &&
+        ref.props.children.props.currentMessage?._id === replyMessage._id
+      ) {
+        swipeableRowRef.current = ref;
+      }
+    },
+    [replyMessage]
   );
+
+  const renderMessageBox = (props: MessageProps<IMessage>) => (
+    <ChatMessageBox
+      {...props}
+      setReplyOnSwipeOpen={setReplyMessage}
+      updateRowRef={updateRowRef}
+    />
+  );
+
+  useEffect(() => {
+    if (replyMessage && swipeableRowRef.current) {
+      swipeableRowRef.current.close();
+      swipeableRowRef.current = null;
+    }
+  }, [replyMessage]);
 
   return (
     <GiftedChat
