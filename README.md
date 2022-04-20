@@ -35,7 +35,7 @@ react-native-gesture-handler
 
 
 ## Author
-Ravil Safargaliev
+👤 Ravil Safargaliev
  - GitHub: [Nellu](https://github.com/Nellu-AI)
  - LinkedIn: [Ravil](https://www.linkedin.com/in/ravil-safargaliev-2823b1234/)
 
